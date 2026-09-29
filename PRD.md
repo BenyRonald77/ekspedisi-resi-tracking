@@ -13,8 +13,8 @@ paketnya.
 
 ## Stack
 
-- Backend: Python + Flask, SQLite (stdlib `sqlite3`)
-- Frontend: HTML + vanilla JS + CSS murni
+- Backend: Next.js 14 + TypeScript, Prisma 5 + SQLite
+- Frontend: React 18 + Tailwind CSS (App Router)
 
 ## Model Data
 

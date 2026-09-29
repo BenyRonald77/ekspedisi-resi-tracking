@@ -1,0 +1,59 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Zona {
+  id           Int     @id @default(autoincrement())
+  nama         String  @unique
+  tarifPerKg   Int     @map("tarif_per_kg")
+  estimasiHari Int     @map("estimasi_hari")
+  paket        Paket[]
+
+  @@map("zona")
+}
+
+model Hub {
+  id    Int    @id @default(autoincrement())
+  nama  String
+  kota  String
+  scans Scan[]
+
+  @@map("hub")
+}
+
+model Paket {
+  id           Int     @id @default(autoincrement())
+  noResi       String  @unique @map("no_resi")
+  namaPengirim String  @map("nama_pengirim")
+  namaPenerima String  @map("nama_penerima")
+  alamatTujuan String  @map("alamat_tujuan")
+  beratKg      Float   @map("berat_kg")
+  zonaId       Int     @map("zona_id")
+  zona         Zona    @relation(fields: [zonaId], references: [id])
+  ongkir       Int
+  status       String  @default("diterima")
+  dibuatPada   String  @map("dibuat_pada")
+  scans        Scan[]
+
+  @@index([noResi])
+  @@map("paket")
+}
+
+model Scan {
+  id         Int    @id @default(autoincrement())
+  paketId    Int    @map("paket_id")
+  paket      Paket  @relation(fields: [paketId], references: [id])
+  hubId      Int    @map("hub_id")
+  hub        Hub    @relation(fields: [hubId], references: [id])
+  waktu      String
+  status     String
+  keterangan String?
+
+  @@index([paketId, waktu])
+  @@map("scan")
+}
