@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<div id="ringkasan" class="cards"></div>
+<h3>Paket Terbaru</h3>
+<table id="tbl"><thead><tr><th>Resi</th><th>Penerima</th><th>Tujuan</th><th>Status</th></tr></thead><tbody></tbody></table>
+{% endblock %}
+{% block scripts %}
+<script>
+(async () => {
+  const r = await api("/api/ringkasan");
+  el("ringkasan").innerHTML =
+    `<div class="card"><h4>Total paket</h4><p><b>${r.total_paket}</b></p></div>
+     <div class="card"><h4>Total ongkir</h4><p><b>${rupiah(r.total_ongkir)}</b></p></div>` +
+    r.per_status.map(x => `<div class="card"><h4>${x.status}</h4><p><b>${x.jumlah}</b></p></div>`).join("");
+  const p = await api("/api/paket");
+  el("tbl").querySelector("tbody").innerHTML = p.slice(0, 10).map(x =>
+    `<tr><td>${x.no_resi}</td><td>${x.nama_penerima}</td><td>${x.nama_zona}</td>
+     <td><span class="badge">${x.status}</span></td></tr>`).join("");
+})();
+</script>
+{% endblock %}

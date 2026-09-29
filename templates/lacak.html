@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Lacak Resi</h2>
+<form id="f">
+  <input id="resi" placeholder="Nomor resi (contoh EXP-20260929-123456)" required>
+  <button>Lacak</button>
+</form>
+<div id="hasil"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+el("f").onsubmit = async e => {
+  e.preventDefault();
+  const resi = el("resi").value.trim().toUpperCase();
+  try {
+    const p = await api("/api/lacak/" + encodeURIComponent(resi));
+    el("hasil").innerHTML = `
+      <div class="card">
+        <h3>${p.no_resi} <span class="badge">${p.status}</span></h3>
+        <p>${p.nama_pengirim} → <b>${p.nama_penerima}</b></p>
+        <p>${p.alamat_tujuan} (${p.nama_zona}, estimasi ${p.estimasi_hari} hari)</p>
+        <p>Berat: ${p.berat_kg} kg · Dikirim: ${p.dibuat_pada}</p>
+        <h4>Riwayat Perjalanan</h4>
+        <ol>${p.riwayat.map(s => `<li><b>${s.waktu}</b> — ${s.nama_hub} (${s.kota}): <span class="badge">${s.status}</span>${s.keterangan ? " — " + s.keterangan : ""}</li>`).join("") || "<li>Belum ada scan.</li>"}</ol>
+      </div>`;
+  } catch (err) { alert(err.message); }
+};
+</script>
+{% endblock %}

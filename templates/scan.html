@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Scan Paket di Hub</h2>
+<form id="f">
+  <input id="resi" placeholder="Nomor resi" required>
+  <select id="hub"></select>
+  <select id="status"></select>
+  <input id="ket" placeholder="Keterangan (opsional)">
+  <button>Scan</button>
+</form>
+<div id="hasil"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+el("status").innerHTML = STATUS.map(s => `<option>${s}</option>`).join("");
+(async () => {
+  const h = await api("/api/hub");
+  el("hub").innerHTML = h.map(x => `<option value="${x.id}">${x.nama} (${x.kota})</option>`).join("");
+})();
+el("f").onsubmit = async e => {
+  e.preventDefault();
+  const r = await post("/api/scan", {
+    no_resi: el("resi").value.trim().toUpperCase(),
+    hub_id: +el("hub").value,
+    status: el("status").value,
+    keterangan: el("ket").value
+  });
+  if (r.error) return;
+  el("hasil").innerHTML = `<div class="alert ok">Tercatat: <b>${r.status}</b> pada ${r.waktu}</div>`;
+  e.target.reset();
+};
+</script>
+{% endblock %}
